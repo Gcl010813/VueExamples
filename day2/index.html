@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>day2</title>
+    <link rel="stylesheet" href="bootstrap-3.4.1-dist/css/bootstrap.css">
+    <script src="dayjs.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <p>
+            {{ username }}
+        </p>
+        <p v-text="gender">性别 : </p><!-- 被覆盖 -->
+        <p>性别 : {{ gender }}</p>
+        <p v-html="info"></p>
+        <input type="text" v-bind:placeholder="tip">
+        <input type="text" :placeholder="tip">
+        <img :src="img_path" alt="" style="width: 100px;">
+        <div :title="'Tiems'+ index">1+2的结果是 {{ 1 + 2 }}</div>
+        <p>{{tip}}反转结果：{{tip.split('').reverse().join('')}}</p>
+        <!-- 事件绑定 -->
+        <p>count 值为 {{ count }}</p>
+        <!-- 传递参数,函数接收   不传参数,默认传递target:e 同时需要穿形参+$event -->
+        <button v-on:click="addValueOne(1,$event)">+1</button>
+        <button @click="subValueOne">-1</button>
+        <!-- 事件修饰符  添加事件绑定时同时进行事件处理 preventDefault 阻止默认行为 -->
+        <a href="http://www.baidu.com" @click.prevent="show">点击跳转百度</a>
+        <!-- 阻止事件冒泡 -->
+        <div @click="divFun" style="width: 100%;height: 50px; background-color: aqua;">
+            <button @click.stop="btnFun">点击</button>
+        </div>
+        <input type="text" @keyup.esc="clearInput" @keyup.enter="printInput">
+        <!-- v-model双向数据绑定 -->
+        <input type="text" v-model="username">
+        <!-- v-bind单向数据绑定 -->
+        <input type="text" :value="username">
+        <hr>
+        <!-- 修改数据类型 -->
+        <input type="text" v-model.number="num1">
+        <span> + </span>
+        <input type="text" v-model.number="num2">
+        <span> = {{num1+num2}}</span>
+        <hr>
+        <!-- 去除末尾空格 -->
+        <input type="text" v-model.trim="name">
+        <button @click="getName">点击打印name</button>
+        <!-- 条件渲染 -->
+        <div v-if="showFlag">v-if 控制</div>
+        <div v-show="showFlag">v-show 控制</div>
+        <div v-if="level=='A'">A</div>
+        <div v-else-if="level=='B'">B</div>
+        <div v-else>C</div>
+        <table class="table table-bordered table-hover" style="text-align: center;">
+            <thead>
+                <tr>
+                    <th>index</th>
+                    <th>name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 官方建议 绑定一个key属性值为字符串或者数字且必须唯一 否则在.vue文件中报错 -->
+                <tr v-for="(item,index) in itemLists" :key="item.id" :title="item.name+(index+1)">
+                    <td>{{item.id}}</td>
+                    <td>{{item.name}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!--品牌案例 -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        <span>添加品牌</span>
+                        <input type="text" placeholder="请输入品牌名称" v-model.trim="newBrand">
+                        <button type="button" class="btn btn-info" @click="addBrand">添加</button>
+                    </th>
+                </tr>
+                <tr>
+                    <th>#</th>
+                    <th>品牌名称</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item,index) in brandLists" :key="item.id">
+                    <td>{{item.id}}</td>
+                    <td>{{item.name}}</td>
+                    <td>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" :id="'customSwitch'+item.id" class="custom-control-input"
+                                v-model="item.status">
+                            <!-- label 扩大点击范围 -->
+                            <label :for="'customSwitch'+item.id">{{item.status==true?'已启用':'已禁用'}}</label>
+                        </div>
+                    </td>
+                    <td>{{item.time | dateFormat }}</td>
+                    <td>
+                        <a href="javascript:;" @click="delBrand(item.id)">删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script src=" vue.js"></script>
+    <script>
+        /* 过滤器 格式化时间 */
+        Vue.filter('dateFormat', function (val) {
+            /* 调用第三方js包 */
+            return dayjs(val).format('YYYY-MM-DD HH:mm:ss')
+        })
+        const div = new Vue({
+            el: '#app',
+            data: {
+                username: 'xiaoGuo',
+                gender: '男',
+                info: '<h3 style="color: red;">小郭</h3>',
+                tip: 'lalala',
+                img_path: 'https://v2.cn.vuejs.org/images/logo.svg',
+                index: 3,
+                count: 0,
+                num1: 1,
+                num2: 2,
+                name: "xiaoGuo",
+                showFlag: true,
+                level: 'A',
+                itemLists: [
+                    { id: 1, name: 'xiaoZhao' },
+                    { id: 2, name: 'xiaoGuo' }
+                ],
+                brandLists: [
+                    { id: 1, name: '宝马', status: true, time: new Date() },
+                    { id: 2, name: '奔驰', status: false, time: new Date() },
+                    { id: 3, name: '奥迪', status: true, time: new Date() },
+                ],
+                newBrand: '',
+                newId: 4,
+            },
+            methods: {
+                addValueOne(n, e) {
+                    this.count += n
+                    console.log(e)
+                    if (this.count % 2 == 0) {
+                        e.target.style.backgroundColor = 'red'
+                    }
+                    else {
+                        e.target.style.backgroundColor = 'blue'
+                    }
+                },
+                subValueOne(e) {
+                    this.count--
+                    console.log(e)
+                },
+                show(e) {
+                    // e.preventDefault()
+                    console.log("跳转成功");
+                },
+                divFun() {
+                    console.log('div');
+                },
+                btnFun() {
+                    console.log('btn');
+                },
+                clearInput(e) {
+                    e.target.value = ""
+                },
+                printInput(e) {
+                    console.log(e.target.value);
+                },
+                getName(e) {
+                    console.log(this.name);
+                },
+                addBrand() {
+                    if (this.newBrand == '') {
+                        return alert("输入品牌名称")
+                    }
+                    else {
+                        const brandObj = {
+                            id: this.newId++,
+                            name: this.newBrand,
+                            status: true,
+                            time: new Date()
+                        }
+                        this.brandLists.push(brandObj)
+                        this.newBrand = ''
+                    }
+                },
+                delBrand(id) {
+                    this.brandLists = this.brandLists.filter(item => item.id != id)
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>
